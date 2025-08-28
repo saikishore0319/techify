@@ -11,7 +11,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const redirect = ()=>{
     navigate('/collection')
-    setShowSearch(! showSearch);
+    setShowSearch(true);
 
   }
 
