@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 const List = () => {
+  const [list, setList] = useState([])
   return (
-    <div>List</div>
+    <div>
+
+    </div>
   )
 }
 
