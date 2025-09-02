@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 
 const Login = () => {
 
-  const { token, setToken, navigate, backendUrl } = useContext(ShopContext)
+  const { token, setToken, navigate, backendUrl, getUserCart } = useContext(ShopContext)
   const [currentState, setCurrentState] = useState('Login')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -41,6 +41,7 @@ const Login = () => {
   useEffect(()=>{
     if(token){
       navigate('/')
+      
     }
   },[token])
 

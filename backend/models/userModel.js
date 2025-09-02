@@ -14,7 +14,7 @@ const userShcema = new mongoose.Schema({
         type: String,
         required: true
     },
-    password:{
+    cartData:{
         type: Object,
         default: {}
     },

@@ -32,6 +32,7 @@ const Cart = () => {
         }
       }
     }
+    
     setCartData(tempData);
   }, [cartItems])
   return (
