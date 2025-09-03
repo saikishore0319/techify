@@ -31,7 +31,7 @@ const orderShcema = new mongoose.Schema({
         required: true,
         default: false
     },
-    payment:{
+    date:{
         type: Number,
         required: true,
     },

@@ -7,7 +7,7 @@ const authUser = async (req,res,next) => {
         if(!token){
             return res.status(401).json({success: false, message:"Please login to proceed"})
         }
-
+        
         try {
             const token_decode = jwt.verify(token, process.env.JWT_SECRET)
             req.userId = token_decode.id
