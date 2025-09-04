@@ -21,18 +21,29 @@ const PlaceOrder = () => {
     phone: '',
   })
 
-  const initPay = (order)=>{
+  const initPay = (order) => {
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: order.amount,
       currency: order.currency,
-      name:'Order payment',
-      description:'Order payment',
+      name: 'Order payment',
+      description: 'Order payment',
       order_id: order.id,
       receipt: order.receipt,
-      handler: async(response)=>{
-        console.log(response);
-        
+      handler: async (response) => {
+        try {
+          const data = await axios.post(backendUrl + "/api/order/verifyRazorpay", response, { headers: { token } })
+          if (data.data.success) {
+            toast.success(data.data.message)
+            navigate('/orders')
+            setCartItems({})
+          }
+        } catch (error) {
+          console.log(error);
+          toast.success(error.message)
+
+        }
+
       }
     }
     const rzp = new window.Razorpay(options)
@@ -87,23 +98,23 @@ const PlaceOrder = () => {
           break
 
         case 'stripe':
-          const responseStripe = await axios.post(backendUrl + '/api/order/stripe',orderData, {headers:{token}})
-          if(responseStripe.data.success){
-            const {session_url} = responseStripe.data
+          const responseStripe = await axios.post(backendUrl + '/api/order/stripe', orderData, { headers: { token } })
+          if (responseStripe.data.success) {
+            const { session_url } = responseStripe.data
             window.location.replace(session_url)
-          }else{
+          } else {
             toast.error(responseStripe.data.message)
           }
-        break
+          break
 
         case 'razorpay':
-          const responseRazorpay = await axios.post(backendUrl + "/api/order/razorpay",orderData,{headers:{token}})
+          const responseRazorpay = await axios.post(backendUrl + "/api/order/razorpay", orderData, { headers: { token } })
           // console.log(responseRazorpay.data.order);
-          
-          if(responseRazorpay.data.success){
+
+          if (responseRazorpay.data.success) {
             initPay(responseRazorpay.data.order)
           }
-        break
+          break
       }
     } catch (error) {
       console.log(error);
