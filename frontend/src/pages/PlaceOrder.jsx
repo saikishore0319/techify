@@ -40,7 +40,7 @@ const PlaceOrder = () => {
           }
         } catch (error) {
           console.log(error);
-          toast.success(error.message)
+          toast.error(error.message)
 
         }
 
@@ -65,14 +65,11 @@ const PlaceOrder = () => {
 
       let orderItems = []
       for (const id in cartItems) {
-        for (const size in cartItems[id]) {
-          if (cartItems[id][size] > 0) {
-            const itemInfo = structuredClone(products.find(product => product._id === id))
-            if (itemInfo) {
-              itemInfo.size = size
-              itemInfo.quantity = cartItems[id][size]
-              orderItems.push(itemInfo)
-            }
+        if (cartItems[id] > 0) {
+          const itemInfo = structuredClone(products.find(product => product._id === id))
+          if (itemInfo) {
+            itemInfo.quantity = cartItems[id]
+            orderItems.push(itemInfo)
           }
         }
       }

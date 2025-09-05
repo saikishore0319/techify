@@ -10,7 +10,7 @@ const Navbar = () => {
   const { setShowSearch, getCartCount, navigate, setToken, token, setCartItems } = useContext(ShopContext);
   const searchNavigate = useNavigate();
   const redirect = () => {
-    searchNavigate('/collection')
+    searchNavigate('/components')
     setShowSearch(true);
   }
 
@@ -31,8 +31,8 @@ const Navbar = () => {
           <p>Home</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
         </NavLink>
-        <NavLink to='/collection' className='flex flex-col items-center gap-1'>
-          <p>Collections</p>
+        <NavLink to='/components' className='flex flex-col items-center gap-1'>
+          <p>Components</p>
           <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
         </NavLink>
         <NavLink to='/about' className='flex flex-col items-center gap-1'>
@@ -78,7 +78,7 @@ const Navbar = () => {
             <p>Back</p>
           </div>
           <NavLink className='py-2 pl-6 border' onClick={() => setVisible(false)} to='/'>HOME</NavLink>
-          <NavLink className='py-2 pl-6 border' onClick={() => setVisible(false)} to='/collection'>COLLECTIONS</NavLink>
+          <NavLink className='py-2 pl-6 border' onClick={() => setVisible(false)} to='/collection'>COMPONENTS</NavLink>
           <NavLink className='py-2 pl-6 border' onClick={() => setVisible(false)} to='/about'>ABOUT US</NavLink>
           <NavLink className='py-2 pl-6 border' onClick={() => setVisible(false)} to='/contact'>CONTACT US</NavLink>
         </div>

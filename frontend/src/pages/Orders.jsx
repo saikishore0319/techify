@@ -58,9 +58,8 @@ const Orders = () => {
                   <div className='flex items-center gap-3 mt-1 text-base to-gray-700'>
                     <p >{currency}{item.price}</p>
                     <p>Quantity: {item.quantity}</p>
-                    <p>Size: {item.size }</p>
                   </div>
-                  <p className='mt-1'>Data: <span className='text-gray-400 '>{new Date(item.date).toDateString()}</span></p>
+                  <p className='mt-1'>Date: <span className='text-gray-400 '>{new Date(item.date).toDateString()}</span></p>
                   <p className='mt-1'>Payment: <span className='text-gray-400 '>{item.paymentMethod}</span></p>
                 </div>
               </div>
