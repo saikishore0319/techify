@@ -42,10 +42,10 @@ const List = ({token}) => {
   }, [])
   return (
     <>
-      <p className='mb-2'>All Product List</p>
-      <div className='flex flex-col gap-2'>
+      <p className='mb-4 text-lg font-semibold text-gray-800'>All Product List</p>
+      <div className='flex flex-col gap-3'>
         {/* List Table Title */}
-        <div className='hidden md:grid grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center py-1 px-2 border bg-gray-100  text-sm'>
+        <div className='hidden md:grid grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center py-2 px-4 border rounded-md bg-gray-100 font-medium text-gray-700 text-sm shadow-sm'>
           <b>Image</b>
           <b>Name</b>
           <b>Category</b>
@@ -56,12 +56,12 @@ const List = ({token}) => {
         {/* Display products list */}
         {
           list.map((item, index)=>(
-              <div key={index} className='grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center gap-2 py-1 px-2 border text-sm '>
-                  <img className='w-12' src={item.image[0]} alt="" />
-                  <p>{item.name}</p>
-                  <p>{item.category}</p>
-                  <p>{currency}{item.price}</p>
-                  <p onClick={()=>removeProduct(item._id)} className='text-right md:text-center cursor-pointer text-lg'>X</p>
+              <div key={index} className='grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center gap-3 py-2 px-4 border rounded-md bg-white text-sm shadow-sm hover:shadow-md transition'>
+                  <img className='w-14 h-14 object-cover rounded-md border' src={item.image[0]} alt="" />
+                  <p className='font-medium text-gray-800 truncate'>{item.name}</p>
+                  <p className='text-gray-600'>{item.category}</p>
+                  <p className='font-semibold text-gray-700'>{currency}{item.price}</p>
+                  <p onClick={()=>removeProduct(item._id)} className='text-right md:text-center cursor-pointer text-red-500 hover:text-red-700 text-lg font-bold'>×</p>
               </div>
           ))
         }
