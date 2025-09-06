@@ -16,9 +16,14 @@ const ShopContextProvider = (props) => {
     const [products, setProducts] = useState([])
     const [token, setToken] = useState('')
     const navigate = useNavigate()
-
+    
     const addToCart = async (itemId) => {
-
+        
+        if(!token){
+            toast.error("Please login first")
+            return
+        }
+        
         let cartData = structuredClone(cartItems);
         if (cartData[itemId]) {
             cartData[itemId] += 1

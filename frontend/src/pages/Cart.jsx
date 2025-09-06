@@ -6,7 +6,7 @@ import CartTotal from '../components/CartTotal';
 import { toast } from 'react-toastify';
 
 const Cart = () => {
-  const { products, currency, cartItems, UpdateQuantity, navigate, getCartAmount } = useContext(ShopContext);
+  const { products, currency, cartItems, UpdateQuantity, navigate, getCartAmount,token } = useContext(ShopContext);
   const [cartData, setCartData] = useState([]);
 
   const onclickHandler = () => {
