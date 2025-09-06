@@ -43,6 +43,12 @@ const Login = () => {
       navigate('/')
     }
   }, [token])
+  useEffect(() => {
+  if (token) {
+    getUserCart(token);
+  }
+}, [token]);
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">

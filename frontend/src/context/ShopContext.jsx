@@ -37,6 +37,8 @@ const ShopContextProvider = (props) => {
 
             }
         }
+       
+       
     }
 
     const getCartCount = () => {
@@ -69,6 +71,13 @@ const ShopContextProvider = (props) => {
         }
     }
 
+/**
+ * The function `getCartAmount` calculates the total amount of items in the cart based on the product
+ * prices and quantities.
+ * @returns The `getCartAmount` function returns the total amount of the items in the cart, calculated
+ * by multiplying the price of each item by the quantity of that item in the cart and summing up these
+ * values.
+ */
     const getCartAmount = () => {
         let totalAmount = 0;
         for (const id in cartItems) {
@@ -123,14 +132,17 @@ const ShopContextProvider = (props) => {
         if (!token && localStorage.getItem('token')) {
             setToken(localStorage.getItem('token'))
             getUserCart(localStorage.getItem('token'))
+            // console.log(token);
+            
         }
     }, [])
+
 
     const value = {
         products, currency, delivery_fee,
         search, setSearch, showSearch, setShowSearch,
         cartItems, addToCart, getCartCount, UpdateQuantity,
-        getCartAmount, navigate, backendUrl, token, setToken, setCartItems
+        getCartAmount, navigate, backendUrl, token, setToken, setCartItems, getUserCart
     }
 
 
