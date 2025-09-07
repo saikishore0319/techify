@@ -18,13 +18,13 @@ import Verify from './pages/Verify'
 
 const App = () => {
   return (
-    <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
+    <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[5vw]'>
       <ToastContainer />
       <Navbar/>
       <SearchBar/>
       <Routes>
         <Route path='/' element={<Home/>}/>
-        <Route path='/collection' element={<Collections/>}/>
+        <Route path='/components' element={<Collections/>}/>
         <Route path='/login' element={<Login/>}/>
         <Route path='/orders' element={<Orders/>}/>
         <Route path='/about' element={<About/>}/>

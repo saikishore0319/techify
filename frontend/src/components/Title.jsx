@@ -1,10 +1,18 @@
 import React from 'react'
 
-const Title = ({text1,text2}) => {
+const Title = ({ text1, text2 }) => {
   return (
-    <div className='inline-flex gap-2 items-center mb-3'>
-        <p className='text-gray-500'>{text1} <span className='text-gray-700 font-medium'>{text2}</span> </p>
-        <p className='w-8 sm:w-12 h-[1px] sm:h-[2px] bg-gray-700 '></p>
+    <div className="flex flex-col items-center mb-8">
+      {/* Main heading with techy gradient highlight on text2 */}
+      <h2 className="text-2xl sm:text-3xl font-bold tracking-wide text-gray-800">
+        {text1}{' '}
+        <span className="bg-gradient-to-r from-orange-500 to-yellow-400 bg-clip-text text-transparent">
+          {text2}
+        </span>
+      </h2>
+
+      {/* Futuristic underline */}
+      <div className="mt-2 w-16 sm:w-24 h-[3px] rounded-full bg-gradient-to-r from-orange-500 to-yellow-500"></div>
     </div>
   )
 }
