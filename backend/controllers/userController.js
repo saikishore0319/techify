@@ -2,16 +2,23 @@ import userModel from '../models/userModel.js'
 import validator from 'validator'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import { sendEmail } from '../utils/sendEmail.js'
 
 const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET)
 }
 
 
+const generateOtp = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+
 // route for user login
 const loginUser = async (req, res) => {
     try {
-        const email = req.body.email.trim()
+        const emailRaw = req.body.email || ''
+        const email = emailRaw.trim().toLowerCase()
         const password = req.body.password
         const user = await userModel.findOne({ email })
 
@@ -24,8 +31,18 @@ const loginUser = async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ success: false, message: "Invalid email or password " })
         }
-        const token = createToken(user._id)
-        return res.status(200).json({ success: true, token, message: "Succesfully logged in" })
+
+        const otp = generateOtp();
+        user.otp = otp;
+        user.otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+        await user.save();
+
+        await sendEmail(email, "Login verification", `Your OTP is: ${otp}`);
+
+        return res.status(200).json({
+            success: true,
+            message: "OTP sent to your email. Please verify.",
+        });
 
     } catch (error) {
         console.log(error);
@@ -37,7 +54,8 @@ const loginUser = async (req, res) => {
 const registerUser = async (req, res) => {
     try {
         const name = req.body.name.trim()
-        const email = req.body.email.trim()
+        const emailRaw = req.body.email || ''
+        const email = emailRaw.trim().toLowerCase()
         const password = req.body.password
         // const { name, email, password } = req.body
 
@@ -61,17 +79,25 @@ const registerUser = async (req, res) => {
         // hashing user password
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
+        const otp = generateOtp()
 
         const newUser = new userModel({
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            otp,
+            otpExpires: new Date(Date.now() + 5 * 60 * 1000)
         })
 
         const user = await newUser.save()
 
-        const token = createToken(user._id)
-        res.status(201).json({ success: true, token })
+        await sendEmail(email, "Verify your account", `Your OTP is: ${otp}`);
+
+        return res.status(201).json({
+            success: true,
+            message: "User registered. OTP sent to your email for verification.",
+        });
+
 
     } catch (error) {
         console.log(error);
@@ -95,4 +121,48 @@ const adminLogin = async (req, res) => {
     }
 }
 
-export { loginUser, registerUser, adminLogin }
+const verifyOtp = async (req, res) => {
+    try {
+        const emailRaw = req.body.email || ""
+        const email = emailRaw.trim().toLowerCase()
+        const { otp } = req.body
+
+        const user = await userModel.findOne({ email })
+        if (!user) {
+            return res
+                .status(404)
+                .json({ success: false, message: "User not found" });
+        }
+
+        if (!user.otp || !user.otpExpires) {
+            return res
+                .status(400)
+                .json({ success: false, message: "No OTP pending for this user" });
+        }
+
+        const expired = user.otpExpires < new Date()
+        const mismatch = user.otp !== otp
+
+        if (expired || mismatch) {
+            return res.status(400).json({
+                success: false,
+                message: expired ? "OTP expired" : "Invalid OTP",
+            });
+        }
+
+        user.otp = undefined
+        user.otpExpires = undefined
+        await user.save()
+
+        const token = createToken(user._id)
+        return res
+            .status(200)
+            .json({ success: true, token, message: "Verification successful" });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+export { loginUser, registerUser, adminLogin, verifyOtp }

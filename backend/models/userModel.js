@@ -18,6 +18,12 @@ const userShcema = new mongoose.Schema({
         type: Object,
         default: {}
     },
+    otp:{
+        type: String
+    },
+    otpExpires:{
+        type:Date
+    }
     
 },{minimize:false})
 
