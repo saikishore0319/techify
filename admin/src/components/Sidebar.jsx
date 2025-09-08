@@ -33,6 +33,15 @@ const Sidebar = () => {
       <p className='hidden md:block'>Orders</p>
     </NavLink>
 
+    <NavLink 
+      className="flex items-center gap-3 px-4 py-2 rounded-l-lg border-l-4 border-transparent 
+                 hover:border-black hover:bg-gray-100 transition-all duration-200" 
+      to={'/sales'}
+    >   
+      <img src={assets.order_icon} className='w-5 h-5 opacity-80' alt="" />
+      <p className='hidden md:block'>Sales</p>
+    </NavLink>
+
   </div>
 </div>
 

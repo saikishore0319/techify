@@ -4,6 +4,7 @@ import userModel from "../models/userModel.js"
 import Stripe from 'stripe'
 import Razorpay from "razorpay"
 import razorpayInstance from 'razorpay'
+import { getStartOf } from "../utils/getStartOf.js"
 // import Orders from "../../frontend/src/pages/Orders.jsx"
 
 
@@ -166,18 +167,18 @@ const verifyRazorpay = async (req, res) => {
         const { razorpay_order_id } = req.body
 
         const orderInfo = await razorpay.orders.fetch(razorpay_order_id)
-        if(orderInfo.status === 'paid'){
-            await orderModel.findByIdAndUpdate(orderInfo.receipt,{payment: true})
-            await orderModel.findByIdAndUpdate(orderInfo.receipt,{cartData:{}})
-            res.status(200).json({success:true,message: "Payment done successfully"})
-        }else{
-            res.status(400).json({success:false, message:"Payment failed"})
+        if (orderInfo.status === 'paid') {
+            await orderModel.findByIdAndUpdate(orderInfo.receipt, { payment: true })
+            await orderModel.findByIdAndUpdate(orderInfo.receipt, { cartData: {} })
+            res.status(200).json({ success: true, message: "Payment done successfully" })
+        } else {
+            res.status(400).json({ success: false, message: "Payment failed" })
         }
 
     } catch (error) {
         console.log(error);
-            res.status(400).json({success:false, message:error.message})
-        
+        res.status(400).json({ success: false, message: error.message })
+
     }
 }
 
@@ -219,4 +220,43 @@ const updateStatus = async (req, res) => {
     }
 }
 
-export { allOrders, placeOrder, placeOrderRazorpay, placeOrderStripe, updateStatus, userOrders, verifyStripe,verifyRazorpay }
+const getSalesStats = async (req, res) => {
+    try {
+        const now = new Date();
+
+        const dayStart = getStartOf("day");
+        const weekStart = getStartOf("week");
+        const monthStart = getStartOf("month");
+
+        const [daily, weekly, monthly, total] = await Promise.all([
+            orderModel.aggregate([
+                { $match: { date: { $gte: dayStart.getTime() } } },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ]),
+            orderModel.aggregate([
+                { $match: { date: { $gte: weekStart.getTime() } } },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ]),
+            orderModel.aggregate([
+                { $match: { date: { $gte: monthStart.getTime() } } },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ]),
+            orderModel.aggregate([
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ])
+        ]);
+
+        res.status(200).json({
+            success: true,
+            daily: daily[0]?.total || 0,
+            weekly: weekly[0]?.total || 0,
+            monthly: monthly[0]?.total || 0,
+            overall: total[0]?.total || 0,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export { allOrders, placeOrder, placeOrderRazorpay, placeOrderStripe, updateStatus, userOrders, verifyStripe, verifyRazorpay,getSalesStats }
