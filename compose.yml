@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    container_name: backend
+    env_file:
+      - ./backend/.env    # contains MONGO_URI, JWT_SECRET, etc.
+    ports:
+      - "5000:5000"       # optional, allows direct access from host
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:80"         # frontend served via Nginx
+    depends_on:
+      - backend
+    restart: unless-stopped

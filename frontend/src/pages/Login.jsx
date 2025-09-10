@@ -4,7 +4,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 
 const Login = () => {
-  const { token, setToken, navigate, backendUrl, getUserCart } = useContext(ShopContext)
+  const { token, setToken, navigate, getUserCart } = useContext(ShopContext)
   const [currentState, setCurrentState] = useState('Login')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -18,7 +18,7 @@ const Login = () => {
       if (!otpStep) {
         // Step 1: login or register -> request OTP
         if (currentState === 'Sign Up') {
-          const response = await axios.post(backendUrl + '/api/user/register', { name, email, password })
+          const response = await axios.post('/api/user/register', { name, email, password })
           if (response.data.success) {
             setOtpStep(true) // show OTP input
             toast.success('OTP sent to your email')
@@ -26,7 +26,7 @@ const Login = () => {
             toast.error(response.data.message)
           }
         } else {
-          const response = await axios.post(backendUrl + '/api/user/login', { email, password })
+          const response = await axios.post('/api/user/login', { email, password })
           if (response.data.success) {
             setOtpStep(true) // show OTP input
             toast.success('OTP sent to your email')
@@ -36,7 +36,7 @@ const Login = () => {
         }
       } else {
         // Step 2: verify OTP
-        const response = await axios.post(backendUrl + '/api/user/verify-otp', { email, otp })
+        const response = await axios.post('/api/user/verify-otp', { email, otp })
         if (response.data.token) {
           setToken(response.data.token)
           localStorage.setItem('token', response.data.token)

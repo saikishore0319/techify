@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import axios from 'axios'
 
 const Orders = () => {
-  const {backendUrl,token, currency} = useContext(ShopContext)
+  const {token, currency} = useContext(ShopContext)
   const [orderData, setOrderData] = useState([])
 
   const loadOrderData = async ()=>{
@@ -15,7 +15,7 @@ const Orders = () => {
         console.log("token not set");
         return null
       }else{
-        const response = await axios.get(backendUrl + "/api/order/userorders",{headers: {token}})
+        const response = await axios.get("/api/order/userorders",{headers: {token}})
         // console.log(response.data.orders);
         // setOrderData(response.data.orders)
         if(response.data.success){

@@ -7,7 +7,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 
 const PlaceOrder = () => {
-  const { navigate, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext)
+  const { navigate, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext)
   const [method, setMethod] = useState('cod');
   const [formData, setFormData] = useState({
     firstName: '',
@@ -32,7 +32,7 @@ const PlaceOrder = () => {
       receipt: order.receipt,
       handler: async (response) => {
         try {
-          const data = await axios.post(backendUrl + "/api/order/verifyRazorpay", response, { headers: { token } })
+          const data = await axios.post("/api/order/verifyRazorpay", response, { headers: { token } })
           if (data.data.success) {
             toast.success(data.data.message)
             navigate('/orders')
@@ -83,7 +83,7 @@ const PlaceOrder = () => {
 
       switch (method) {
         case 'cod':
-          const response = await axios.post(backendUrl + '/api/order/place', orderData, { headers: { token } })
+          const response = await axios.post('/api/order/place', orderData, { headers: { token } })
 
           if (response.data.success) {
             setCartItems({})
@@ -95,7 +95,7 @@ const PlaceOrder = () => {
           break
 
         case 'stripe':
-          const responseStripe = await axios.post(backendUrl + '/api/order/stripe', orderData, { headers: { token } })
+          const responseStripe = await axios.post('/api/order/stripe', orderData, { headers: { token } })
           if (responseStripe.data.success) {
             const { session_url } = responseStripe.data
             window.location.replace(session_url)
@@ -105,7 +105,7 @@ const PlaceOrder = () => {
           break
 
         case 'razorpay':
-          const responseRazorpay = await axios.post(backendUrl + "/api/order/razorpay", orderData, { headers: { token } })
+          const responseRazorpay = await axios.post("/api/order/razorpay", orderData, { headers: { token } })
           // console.log(responseRazorpay.data.order);
 
           if (responseRazorpay.data.success) {
