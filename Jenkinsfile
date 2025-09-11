@@ -64,12 +64,11 @@ pipeline {
     }
 
     post {
-        always {
-            // Clean up Docker resources to save space on the Jenkins node
-            sh '''
-                echo " Cleaning up unused docker resources..."
-                docker system prune -af || true
-            '''
+        success {
+            sh "echo build success"
+        }
+        failure {
+            sh "echo build failed"
         }
     }
 }
