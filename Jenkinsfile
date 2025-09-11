@@ -11,6 +11,7 @@ pipeline {
         DOCKER_CREDS = credentials('docker-hub-creds')
         BACKEND_IMAGE  = "${DOCKER_USER}/techify-backend:latest"
         FRONTEND_IMAGE = "${DOCKER_USER}/techify-frontend:latest"
+        BACKEND_ENV_FILE = credentials('backend-env-file')
         SONARQUBE_SERVER = tool 'Sonar'         
   
     }
@@ -66,6 +67,8 @@ pipeline {
         stage('Push Images to Docker Hub') {
             steps {
                 sh '''
+                    whoami
+                    
                     docker push ${BACKEND_IMAGE}
                     docker push ${FRONTEND_IMAGE}
                 '''
@@ -73,17 +76,13 @@ pipeline {
         }
 
         stage('Prepare Backend Env for Deployment') {
-            steps {
-                withCredentials([file(credentialsId: 'backend-env-file', variable: 'BACKEND_ENV_PATH')]) {
-                    sh '''
-                        mkdir -p ./backend
-                        cp "$BACKEND_ENV_PATH" ./backend/.env
-                        echo "Backend .env copied for runtime"
+             steps {
+                sh '''
+                    cp "$BACKEND_ENV_FILE" ./backend/.env
+                    echo " Backend .env copied for runtime"
                     '''
-                }
             }
         }
-
 
         stage('Deploy with Docker Compose') {
             steps {
