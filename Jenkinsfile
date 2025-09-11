@@ -21,7 +21,7 @@ pipeline {
             steps {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
                     sh '''
-                        sonar-scanner \
+                        SonarScanner \
                             -Dsonar.projectKey=techify \
                             -Dsonar.sources=. \
                             -Dsonar.host.url=$SONAR_HOST_URL \
