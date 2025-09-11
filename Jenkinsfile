@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label "any"
+         label 'any'
          customWorkspace '/home/jenkins/workspace/techify'
         }
 
