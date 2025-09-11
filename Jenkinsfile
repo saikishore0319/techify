@@ -7,8 +7,8 @@ pipeline {
         BACKEND_IMAGE  = "${DOCKER_USER}/techify-backend:latest"
         FRONTEND_IMAGE = "${DOCKER_USER}/techify-frontend:latest"
         BACKEND_ENV_FILE = credentials('backend-env-file')
-        SONARQUBE_SERVER = 'Sonar'          // Jenkins configured SonarQube server name
-        SONARQUBE_TOKEN  = credentials('Sonar') // Jenkins credential
+        SONARQUBE_SERVER = tool 'Sonar'         
+  
     }
 
     stages {
@@ -19,13 +19,11 @@ pipeline {
         }
         stage('SonarQube Scan') {
             steps {
-                withSonarQubeEnv("${SONARQUBE_SERVER}") {
+                withSonarQubeEnv("Sonar") {
                     sh '''
-                        SonarScanner \
+                        $SONARQUBE_SERVER/bin/sonar-scanner \
+                            -Dsonar.projectName=techify \
                             -Dsonar.projectKey=techify \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=$SONAR_HOST_URL \
-                            -Dsonar.login=$SONARQUBE_TOKEN
                     '''
                 }
             }
