@@ -1,8 +1,10 @@
 pipeline {
-    agent {
-         label 'any'
-         customWorkspace '/home/jenkins/workspace/techify'
+   agent {
+        node {
+            label 'any'
+            customWorkspace '/home/jenkins/workspace/techify'
         }
+    }
 
     environment {
         DOCKER_USER = 'saikishore1903'
