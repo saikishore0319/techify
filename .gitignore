@@ -1,2 +1,6 @@
 node_modules/
 .env
+# SonarQube
+.scannerwork/
+# OWASP Dependency-Check
+dependency-check-report/
