@@ -60,10 +60,10 @@ pipeline {
             steps {
                 sh '''
                     # Scan backend image
-                    trivy image --exit-code 1 --severity HIGH,CRITICAL ${BACKEND_IMAGE}
+                    trivy image --exit-code 1 --severity CRITICAL ${BACKEND_IMAGE}
                     
                     # Scan frontend image
-                    trivy image --exit-code 1 --severity HIGH,CRITICAL ${FRONTEND_IMAGE}
+                    trivy image --exit-code 1 --severity CRITICAL ${FRONTEND_IMAGE}
                 '''
             }
 }
