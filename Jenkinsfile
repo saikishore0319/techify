@@ -79,9 +79,6 @@ pipeline {
                     withCredentials([file(credentialsId: 'backend-env-file', variable: 'BACKEND_ENV_PATH')]) {
                         sh '''
                             mkdir -p ./backend
-                            
-                            chmod 777 ./backend
-                            
                             cp "${BACKEND_ENV_PATH}" ./backend/.env
                             echo "Backend .env copied for runtime"
                         '''
