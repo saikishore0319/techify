@@ -1,5 +1,8 @@
 pipeline {
-    agent any
+    agent {
+        label "any"
+         customWorkspace '/home/jenkins/workspace/techify'
+        }
 
     environment {
         DOCKER_USER = 'saikishore1903'
