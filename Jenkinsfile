@@ -8,7 +8,6 @@ pipeline {
 
     environment {
         DOCKER_USER = 'saikishore1903'
-        DOCKER_CREDS = credentials('docker-hub-creds')
         BACKEND_IMAGE  = "${DOCKER_USER}/techify-backend:latest"
         FRONTEND_IMAGE = "${DOCKER_USER}/techify-frontend:latest"
         BACKEND_ENV_FILE = credentials('backend-env-file')
@@ -51,8 +50,10 @@ pipeline {
 
         stage('Push Images to Docker Hub') {
             steps {
-                sh '''
-                     echo "$DOCKER_CREDS_PSW" | docker login -u "$DOCKER_USER" --password-stdin
+                 withCredentials([usernamePasword(credentialsId: 'docker-hub-creds', passwordVariable: 'dockerhubpass',usernameVariable: 'dockerhubuser')]){
+                    sh "docker login -u ${dockerhubuser} -p${dockerhubpass}"
+                 }
+                sh ''' 
                     docker push ${BACKEND_IMAGE}
                     docker push ${FRONTEND_IMAGE}
                 '''
