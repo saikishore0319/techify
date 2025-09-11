@@ -48,21 +48,25 @@ pipeline {
             }
         }
 
-        stage('Build Backend Image') {
+        stage('Build  Images') {
             steps {
                 sh '''
                     docker build -t ${BACKEND_IMAGE} ./backend
-                '''
-            }
-        }
-
-        stage('Build Frontend Image') {
-            steps {
-                sh '''
                     docker build -t ${FRONTEND_IMAGE} ./frontend
                 '''
             }
         }
+        stage('Trivy Image Scan') {
+            steps {
+                sh '''
+                    # Scan backend image
+                    trivy image --exit-code 1 --severity HIGH,CRITICAL ${BACKEND_IMAGE}
+                    
+                    # Scan frontend image
+                    trivy image --exit-code 1 --severity HIGH,CRITICAL ${FRONTEND_IMAGE}
+                '''
+            }
+}
 
         stage('Push Images to Docker Hub') {
             steps {
