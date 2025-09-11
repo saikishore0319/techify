@@ -65,6 +65,8 @@ pipeline {
         stage('Prepare Backend Env for Deployment') {
              steps {
                 sh '''
+                    mkdir -p ./backend
+                    chmod u+w ./backend
                     cp "$BACKEND_ENV_FILE" ./backend/.env
                     echo " Backend .env copied for runtime"
                     '''
