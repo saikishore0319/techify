@@ -40,14 +40,6 @@ pipeline {
             }   
         }   
 
-        stage('Login to Docker Hub') {
-            steps {
-                sh '''
-                    echo "$DOCKER_CREDS_PSW" | docker login -u "$DOCKER_USER" --password-stdin
-                '''
-            }
-        }
-
         stage('Build  Images') {
             steps {
                 sh '''
@@ -60,6 +52,7 @@ pipeline {
         stage('Push Images to Docker Hub') {
             steps {
                 sh '''
+                     echo "$DOCKER_CREDS_PSW" | docker login -u "$DOCKER_USER" --password-stdin
                     docker push ${BACKEND_IMAGE}
                     docker push ${FRONTEND_IMAGE}
                 '''
