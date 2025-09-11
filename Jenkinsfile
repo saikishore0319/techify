@@ -76,13 +76,14 @@ pipeline {
         stage('Prepare Backend Env for Deployment') {
             steps {
                 script {
-                    // Use withCredentials to get a temporary path to the secret file
                     withCredentials([file(credentialsId: 'backend-env-file', variable: 'BACKEND_ENV_PATH')]) {
-                        // Now, you can safely copy the temporary file to your project
                         sh '''
                             mkdir -p ./backend
+                            
+                            chmod 777 ./backend
+                            
                             cp "${BACKEND_ENV_PATH}" ./backend/.env
-                            echo " Backend .env copied for runtime"
+                            echo "Backend .env copied for runtime"
                         '''
                     }
                 }
