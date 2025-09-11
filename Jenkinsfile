@@ -1,39 +1,75 @@
 pipeline {
     agent any
 
+    environment {
+        // 🔹 Hard-coded Docker Hub username
+        DOCKER_USER = 'saikishore1903'
+
+        // 🔹 Jenkins credential ID for Docker Hub password or token
+        DOCKER_CREDS = credentials('docker-hub-creds')
+
+        // 🔹 Images with tag
+        BACKEND_IMAGE  = "${DOCKER_USER}/techify-backend:latest"
+        FRONTEND_IMAGE = "${DOCKER_USER}/techify-frontend:latest"
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                echo "Checking out code..."
-                 checkout scm  // (uncomment if using pipeline from SCM)
+                checkout scm
             }
         }
 
-        stage('Build') {
+        stage('Login to Docker Hub') {
             steps {
-                echo "Building the project..."
+                sh '''
+                    echo "$DOCKER_CREDS_PSW" | docker login -u "$DOCKER_USER" --password-stdin
+                '''
             }
         }
 
-        stage('Test') {
+        stage('Build Backend Image') {
             steps {
-                echo "Running tests..."
+                sh '''
+                    docker build -t ${BACKEND_IMAGE} ./backend
+                '''
             }
         }
 
-        stage('Deploy') {
+        stage('Build Frontend Image') {
             steps {
-                echo "Deploying application..."
+                sh '''
+                    docker build -t ${FRONTEND_IMAGE} ./frontend
+                '''
+            }
+        }
+
+        stage('Push Images to Docker Hub') {
+            steps {
+                sh '''
+                    docker push ${BACKEND_IMAGE}
+                    docker push ${FRONTEND_IMAGE}
+                '''
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                sh '''
+                    docker compose pull
+                    docker compose up -d
+                '''
             }
         }
     }
 
     post {
-        success {
-            echo "Pipeline completed successfully!"
-        }
-        failure {
-            echo "Pipeline failed!"
+        always {
+            // Clean up Docker resources to save space on the Jenkins node
+            sh '''
+                echo " Cleaning up unused docker resources..."
+                docker system prune -af || true
+            '''
         }
     }
 }
