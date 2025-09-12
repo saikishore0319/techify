@@ -47,6 +47,15 @@ pipeline {
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }   
         }   
+        stage('Trivy file system scan') {
+            steps {
+                sh '''
+                    trivy fs --exit-code 0 --severity HIGH,CRITICAL --format json -o trivy-report.json .
+                '''
+                archiveArtifacts artifacts: 'trivy-report.json', fingerprint: true
+
+            }   
+        }   
 
         stage('Build  Images') {
             steps {
