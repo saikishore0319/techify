@@ -9,7 +9,6 @@ pipeline{
     environment{
         DOCKER_USER = 'saikishore1903'
         SONARQUBE_SERVER = tool 'Sonar'
-        BACKEND_ENV_FILE = credentials('backend-env-file')
     }
     stages{
         stage('Checkout'){
@@ -95,7 +94,7 @@ pipeline{
         stage('prepare env file'){
             steps{
                 script{
-                    prepare_env_file(env.BACKEND_ENV_FILE)
+                    prepare_env_file('backend-env-file')
                 }
             }
         }
