@@ -37,7 +37,7 @@ pipeline{
         stage('SonarQube Scan'){
             steps{
                 script{
-                    sonarqube_analysis('Sonar','techify','tecchify')
+                    sonarqube_analysis('Sonar','techify','techify')
                 }
             }
         }
@@ -95,7 +95,7 @@ pipeline{
         stage('prepare env file'){
             steps{
                 script{
-                    prepare_env_file(BACKEND_ENV_FILE)
+                    prepare_env_file(env.BACKEND_ENV_FILE)
                 }
             }
         }
