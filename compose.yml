@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   backend:
-    image: saikishore1903/techify-backend.latest
+    image: saikishore1903/techify-backend:latest
     container_name: backend
     env_file:
       - ./backend/.env    # contains MONGO_URI, JWT_SECRET, etc.
@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: saikishore1903/techify-frontend.latest
+    image: saikishore1903/techify-frontend:latest
     container_name: frontend
     ports:
       - "3000:80"         # frontend served via Nginx
