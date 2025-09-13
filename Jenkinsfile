@@ -1,107 +1,108 @@
-pipeline {
-   agent {
-        node {
+pipeline{
+    agent{
+        node{
             label ''
             customWorkspace '/home/jenkins/workspace/techify'
         }
     }
-
-    environment {
-        DOCKER_USER = 'saikishore1903'
-        BACKEND_IMAGE  = "${DOCKER_USER}/techify-backend:latest"
-        FRONTEND_IMAGE = "${DOCKER_USER}/techify-frontend:latest"
-        BACKEND_ENV_FILE = credentials('backend-env-file')
-        SONARQUBE_SERVER = tool 'Sonar'         
-  
+    parameters{
+        string(name: "FRONTEND_DOCKER_TAG", defaultValue: "", description:'version of the docker image')
+        string(name: "BACKEND_DOCKER_TAG", defaultValue: "", description:'version of the docker image')
     }
-
-    stages {
-        stage('Checkout') {
-            steps {
-                cleanWs()
-                checkout scm
-            }
-        }
-        stage('SonarQube Scan') {
-            steps {
-                withSonarQubeEnv("Sonar") {
-                    sh '''
-                        $SONARQUBE_SERVER/bin/sonar-scanner \
-                            -Dsonar.projectName=techify \
-                            -Dsonar.projectKey=techify \
-                    '''
-                }
-            }
-        }
-        stage("Quality Gate") {
-            steps {
-            timeout(time: 1, unit: 'HOURS') {
-                waitForQualityGate abortPipeline: true
-            }
-            }
-        }
-
-        stage('OWASP Dependency Check') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'OWASP'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }   
-        }   
-        stage('Trivy file system scan') {
-            steps {
-                sh '''
-                    trivy fs --exit-code 0 --severity HIGH,CRITICAL --format json -o trivy-report.json .
-                '''
-                archiveArtifacts artifacts: 'trivy-report.json', fingerprint: true
-
-            }   
-        }   
-
-        stage('Build  Images') {
-            steps {
-                sh '''
-                    docker build -t ${BACKEND_IMAGE} ./backend
-                    docker build -t ${FRONTEND_IMAGE} ./frontend
-                '''
-            }
-        }
-
-        stage('Push Images to Docker Hub') {
-            steps {
-                 withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'dockerhubpass',usernameVariable: 'dockerhubuser')]){
-                    sh "docker login -u ${dockerhubuser} -p${dockerhubpass}"
-                 }
-                sh ''' 
-                    docker push ${BACKEND_IMAGE}
-                    docker push ${FRONTEND_IMAGE}
-                '''
-            }
-        }
-
-        stage('Prepare Backend Env for Deployment') {
-            steps {
-                script {
-                    withCredentials([file(credentialsId: 'backend-env-file', variable: 'BACKEND_ENV_PATH')]) {
-                        sh '''
-                            mkdir -p ./backend
-                            cp "${BACKEND_ENV_PATH}" ./backend/.env
-                            echo "Backend .env copied for runtime"
-                        '''
+    environment{
+        DOCKER_USER = 'saikishore1903'
+        SONARQUBE_SERVER = tool 'Sonar'
+        BACKEND_ENV_FILE = credentials('backend-env-file')
+    }
+    stages{
+        stage('Validate Parameters'){
+            steps{
+                script{
+                    if(params.FRONTEND_DOCKER_TAG == '' || params.BACKEND_DOCKER_TAG == ''){
+                        error("FRONTEND_DOCKER_TAG and BACKEND_DOCKER_TAG nust be provided")
                     }
                 }
             }
         }
+        stage('Checkout'){
+            steps{
+                cleanWs()
+                checkout scm
+            }
+        }
+        stage('SonarQube Scan'){
+            steps{
+                script{
+                    sonarqube_analysis('Sonar','techify','tecchify')
+                }
+            }
+        }
+        stage('QualityGate check'){
+            steps{
+                script{
+                    quality_gates()
+                }
+            }
+        }
+        stage('OWASP Dependency Check'){
+            steps{
+                script{
+                    owasp_dependency_check('OWASP')
+                }
+            }
+        }
+        stage('Trivy file system scan'){
+            steps{
+                script{
+                    trivy_scan()
+                }
+            }
+        }
+        stage('Build Docker image'){
+            steps{
+                script{
 
-        stage('Deploy with Docker Compose') {
-            steps {
-                sh '''
-                    docker compose pull
-                    docker compose up -d
-                '''
+                    dir('backend'){
+                    dockerBuild("techify-backend","${params.BACKEND_DOCKER_TAG}","${DOCKER_USER}")
+                    }
+
+                    dir('frontend'){
+                    dockerBuild("techify-frontend","${params.FRONTEND_DOCKER_TAG}","${DOCKER_USER}")
+                    }
+                    
+                }
+            }
+        }
+        stage('Push images to registry'){
+            steps{
+                script{
+                    docker_push('docker-hub-creds', 'techify-frontend',"${params.FRONTEND_DOCKER_TAG}")
+                    docker_push('docker-hub-creds', 'techify-backend',"${params.BACKEND_DOCKER_TAG}")
+                }
+            }
+        }
+        stage('change the tags'){
+            steps{
+                script{
+                    update_compose_file("${params.FRONTEND_DOCKER_TAG}","${params.BACKEND_DOCKER_TAG}",env.DOCKER_USER)
+                }
+            }
+        }
+        stage('prepare env file'){
+            steps{
+                script{
+                    prepare_env_file(BACKEND_ENV_FILE)
+                }
+            }
+        }
+        stage('Deploy'){
+            steps{
+                script{
+                    docker_compose()
+                }
             }
         }
     }
-
     post {
         success {
             sh 'echo "build success"'
