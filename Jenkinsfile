@@ -11,15 +11,6 @@ pipeline{
         BACKEND_ENV_FILE = credentials('backend-env-file')
     }
     stages{
-        stage('Validate Parameters'){
-            steps{
-                script{
-                    if(params.FRONTEND_DOCKER_TAG == '' || params.BACKEND_DOCKER_TAG == ''){
-                        error("FRONTEND_DOCKER_TAG and BACKEND_DOCKER_TAG nust be provided")
-                    }
-                }
-            }
-        }
         stage('Checkout'){
             steps{
                 cleanWs()
@@ -30,6 +21,15 @@ pipeline{
             steps{
                 script{
                     read_tags()
+                }
+            }
+        }
+        stage('Validate Parameters'){
+            steps{
+                script{
+                    if(env.FRONTEND_TAG == '' || env.BACKEND_TAG == ''){
+                        error("FRONTEND_DOCKER_TAG and BACKEND_DOCKER_TAG must be provided")
+                    }
                 }
             }
         }
@@ -66,11 +66,11 @@ pipeline{
                 script{
 
                     dir('backend'){
-                    dockerBuild("techify-backend","${params.BACKEND_DOCKER_TAG}","${DOCKER_USER}")
+                    dockerBuild("techify-backend","${env.BACKEND_TAG}","${DOCKER_USER}")
                     }
 
                     dir('frontend'){
-                    dockerBuild("techify-frontend","${params.FRONTEND_DOCKER_TAG}","${DOCKER_USER}")
+                    dockerBuild("techify-frontend","${env.FRONTEND_TAG}","${DOCKER_USER}")
                     }
                     
                 }
@@ -79,15 +79,15 @@ pipeline{
         stage('Push images to registry'){
             steps{
                 script{
-                    docker_push('docker-hub-creds', 'techify-frontend',"${params.FRONTEND_DOCKER_TAG}")
-                    docker_push('docker-hub-creds', 'techify-backend',"${params.BACKEND_DOCKER_TAG}")
+                    docker_push('docker-hub-creds', 'techify-frontend',"${env.FRONTEND_TAG}")
+                    docker_push('docker-hub-creds', 'techify-backend',"${env.BACKEND_TAG}")
                 }
             }
         }
         stage('change the tags'){
             steps{
                 script{
-                    update_compose_file("${params.FRONTEND_DOCKER_TAG}","${params.BACKEND_DOCKER_TAG}",env.DOCKER_USER)
+                    update_compose_file("${env.FRONTEND_TAG}","${env.BACKEND_TAG}",env.DOCKER_USER)
                 }
             }
         }
