@@ -5,10 +5,6 @@ pipeline{
             customWorkspace '/home/jenkins/workspace/techify'
         }
     }
-    parameters{
-        string(name: "FRONTEND_DOCKER_TAG", defaultValue: "", description:'version of the docker image')
-        string(name: "BACKEND_DOCKER_TAG", defaultValue: "", description:'version of the docker image')
-    }
     environment{
         DOCKER_USER = 'saikishore1903'
         SONARQUBE_SERVER = tool 'Sonar'
@@ -28,6 +24,13 @@ pipeline{
             steps{
                 cleanWs()
                 checkout scm
+            }
+        }
+        stage('Read tags'){
+            steps{
+                script{
+                    read_tags()
+                }
             }
         }
         stage('SonarQube Scan'){
