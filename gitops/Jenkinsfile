@@ -40,12 +40,8 @@ pipeline{
                 script{
                     dir('k8s'){
                         sh """
-                         sed -i 's|image: saikishore1903/techify-frontend:.*|image: saikishore1903/techify-frontend:${params.FRONTEND_TAG}|' k8s/frontend.yml
-                         """
-                    }
-                    dir('k8s'){
-                        sh """
-                         sed -i 's|image: saikishore1903/techify-frontend:.*|image: saikishore1903/techify-frontend:${params.BACKEND_TAG}|' k8s/backend.yml
+                         sed -i 's|image: saikishore1903/techify-frontend:.*|image: saikishore1903/techify-frontend:${params.FRONTEND_TAG}|' frontend.yml
+                         sed -i 's|image: saikishore1903/techify-backend:.*|image: saikishore1903/techify-backend:${params.BACKEND_TAG}|' backend.yml
                          """
                     }
                 }
@@ -54,22 +50,28 @@ pipeline{
         stage('Push to Github'){
             steps{
                 script{
-                    withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Default')]){
-                        sh'''
+                  withCredentials([usernamePassword(credentialsId: 'github-cred',usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]){
+                        sh"""
+                            git config user.name "techify-cd-bot"
+                            git config user.email "ci-bot@techify.com"
                             echo "adding files to staging"
                             git add .
 
                             echo "commiting chages"
-                            git commit -m"updated docker tags inside k8s manifest"
+                            git commit -m "updated docker tags inside k8s manifest" || echo "No changes to commit"
 
                             echo "push the chnages"
-                            git push https://github.com/saikishore0319/techify.git devops
-                        '''
+                            git push https://$GIT_USER:$GIT_PASS@github.com/saikishore0319/techify.git devops
+                        """
                     }
                 }
             }
         }
 
+    }
+    post {
+    success { echo "CD pipeline completed successfully" }
+    failure { echo "CD pipeline failed" }
     }
 
 }

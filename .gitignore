@@ -8,3 +8,4 @@ dependency-check-report/
 kubeseal*
 
 secret.yaml
+.env.k8s
