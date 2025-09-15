@@ -18,7 +18,9 @@ spec:
         image: saikishore1903/techify-backend:v1.0
         ports:
         - containerPort: 5000
-
+        envFrom:
+        - secretRef:
+            name: techify-env
 ---
 
 apiVersion: v1

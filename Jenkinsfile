@@ -84,31 +84,35 @@ pipeline{
                 }
             }
         }
-        stage('change the tags'){
-            steps{
-                script{
-                    update_compose_file("${env.FRONTEND_TAG}","${env.BACKEND_TAG}",env.DOCKER_USER)
-                }
-            }
-        }
-        stage('prepare env file'){
-            steps{
-                script{
-                    prepare_env_file('backend-env-file')
-                }
-            }
-        }
-        stage('Deploy'){
-            steps{
-                script{
-                    docker_compose()
-                }
-            }
-        }
+    //     stage('change the tags'){
+    //         steps{
+    //             script{
+    //                 update_compose_file("${env.FRONTEND_TAG}","${env.BACKEND_TAG}",env.DOCKER_USER)
+    //             }
+    //         }
+    //     }
+    //     stage('prepare env file'){
+    //         steps{
+    //             script{
+    //                 prepare_env_file('backend-env-file')
+    //             }
+    //         }
+    //     }
+    //     stage('Deploy'){
+    //         steps{
+    //             script{
+    //                 docker_compose()
+    //             }
+    //         }
+    //     }
     }
     post {
         success {
-            sh 'echo "build success"'
+            build job: 'techify-CD',
+            parameters: [
+                string(name: 'FRONTEND_TAG', value: env.FRONTEND_TAG),
+                string(name: 'BACKEND_TAG', value: env.BACKEND_TAG)
+            ]
         }
         failure {
             sh 'echo "build failed"'

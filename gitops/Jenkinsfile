@@ -1,0 +1,75 @@
+@Library('Shared')_
+pipeline{
+    agent{
+        node{
+            label ''
+            customWorkspace '/home/jenkins/workspace/techify-CD'
+        }
+    }
+
+   parameters {
+    string(name: 'FRONTEND_TAG', defaultValue: '', description: 'Frontend Docker Tag')
+    string(name: 'BACKEND_TAG', defaultValue: '', description: 'Backend Docker Tag')
+    }
+
+    stages{
+        stage('Clean WS'){
+            steps{
+                script{
+                    cleanWs()
+                }
+            }
+        }
+        stage('Checkout code'){
+            steps{
+                script{
+                    githubClone('https://github.com/saikishore0319/techify.git','devops')
+                }
+            }
+        }
+        stage('Verify docker tags'){
+            steps{
+                script{
+                    echo "FRONTEND_DOCKERTAG: ${params.FRONTEND_TAG}"
+                    echo "BACKEND_DOCKERTAG: ${params.BACKEND_TAG}"
+                }
+            }
+        }
+        stage('Update the k8s manifest'){
+            steps{
+                script{
+                    dir('k8s'){
+                        sh """
+                         sed -i 's|image: saikishore1903/techify-frontend:.*|image: saikishore1903/techify-frontend:${params.FRONTEND_TAG}|' k8s/frontend.yml
+                         """
+                    }
+                    dir('k8s'){
+                        sh """
+                         sed -i 's|image: saikishore1903/techify-frontend:.*|image: saikishore1903/techify-frontend:${params.BACKEND_TAG}|' k8s/backend.yml
+                         """
+                    }
+                }
+            }
+        }
+        stage('Push to Github'){
+            steps{
+                script{
+                    withCredentials([gitUsernamePassword(credentialsId: 'github-cred', gitToolName: 'Default')]){
+                        sh'''
+                            echo "adding files to staging"
+                            git add .
+
+                            echo "commiting chages"
+                            git commit -m"updated docker tags inside k8s manifest"
+
+                            echo "push the chnages"
+                            git push https://github.com/saikishore0319/techify.git devops
+                        '''
+                    }
+                }
+            }
+        }
+
+    }
+
+}

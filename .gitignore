@@ -4,3 +4,7 @@ node_modules/
 .scannerwork/
 # OWASP Dependency-Check
 dependency-check-report/
+
+kubeseal*
+
+secret.yaml
