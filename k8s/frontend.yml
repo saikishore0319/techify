@@ -12,7 +12,8 @@ spec:
     metadata:
       labels:
         app: frontend
-    spec:
+    spec:         
+      automountServiceAccountToken: false 
       containers:
       - name: frontend
         image: saikishore1903/techify-frontend:v1.0
@@ -22,9 +23,11 @@ spec:
           requests:
             memory: "256Mi"
             cpu: "250m"
+            ephemeral-storage: "1Gi"
           limits:
             memory: "512Mi"
             cpu: "500m"
+            ephemeral-storage: "2Gi"
 
 ---
 
