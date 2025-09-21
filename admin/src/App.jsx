@@ -8,6 +8,7 @@ import Orders from './pages/Orders'
 import Login from './components/Login'
 import { ToastContainer } from 'react-toastify';
 import AdminDashboard from './pages/Sales'
+import Inventory from './pages/Inventory'
 export const backendUrl = import.meta.env.VITE_BACKEND_URL
 export const currency = "₹"
 
@@ -34,6 +35,7 @@ const App = () => {
                 <Route path='/list' element={<List token={token} />} />
                 <Route path='/orders' element={<Orders  token={token}/>} />
                 <Route path='/sales' element={<AdminDashboard  token={token}/>} />
+                <Route path="/inventory" element={<Inventory token={token} />} />
               </Routes>
             </div>
           </div>

@@ -2,6 +2,7 @@ import express from 'express'
 import {addProduct, listProducts, removeProduct, singleProduct} from '../controllers/productController.js'
 import upload from '../middleware/multer.js';
 import adminAuth from '../middleware/admiAuth.js';
+import { getInventory,updateInventory } from '../controllers/inventoryController.js';
 
 const productRouter = express.Router();
 
@@ -10,6 +11,9 @@ productRouter.post('/remove',adminAuth,removeProduct);
 productRouter.post('/single',singleProduct);
 productRouter.get('/list',listProducts);
 
+
+productRouter.get("/inventory", adminAuth, getInventory);
+productRouter.post("/inventory/update", adminAuth, updateInventory);
 
 
 export default productRouter

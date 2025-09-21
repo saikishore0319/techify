@@ -21,16 +21,20 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    bestseller:{
+    bestseller: {
         type: Boolean,
     },
-    date:{
+    date: {
         type: Number,
         required: true
     },
 
+    stock: {
+        type: Number,
+        default: 0
+    }
 })
 
-const productModel = mongoose.models.product || mongoose.model("product",productSchema)
+const productModel = mongoose.models.product || mongoose.model("product", productSchema)
 
 export default productModel
