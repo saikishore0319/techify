@@ -2,6 +2,7 @@ import userModel from '../models/userModel.js'
 import validator from 'validator'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import adminModel from '../models/adminModel.js'
 import { sendEmail } from '../utils/sendEmail.js'
 
 const createToken = (id) => {
@@ -107,19 +108,45 @@ const registerUser = async (req, res) => {
 
 //route for admin login
 const adminLogin = async (req, res) => {
-    try {
-        const { email, password } = req.body
-        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-            const token = jwt.sign(email + password, process.env.JWT_SECRET)
-            res.status(200).json({ success: true, message: "logged in successfully", token })
-        } else {
-            res.status(400).json({ success: false, message: "invalid credentials" })
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(400).json({ success: false, message: error.message })
+  try {
+    const { email, password } = req.body;
+
+    const admin = await adminModel.findOne({ email });
+    if (!admin) {
+      return res.status(404).json({ success: false, message: "Admin not found" });
     }
-}
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Invalid password" });
+    }
+
+    // Create JWT with admin id
+    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+    res.status(200).json({ success: true, token, message: "Logged in successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const createAdmin = async () => {
+  const exists = await adminModel.findOne({ email: "admin@techify.com" });
+  if (exists) return;
+
+  const hashedPassword = await bcrypt.hash("Sai@2001", 10);
+
+  const admin = new adminModel({
+    name: "Techify Admin",
+    email: "admin@techify.com",
+    password: hashedPassword,
+  });
+
+  await admin.save();
+  console.log("Admin created!");
+};
+
+createAdmin();
 
 const verifyOtp = async (req, res) => {
     try {
