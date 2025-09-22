@@ -21,7 +21,7 @@ const Collections = () => {
 
   const applyfilter = () => {
     let productsCopy = products.slice();
-
+    
     if (search && showSearch) {
       productsCopy = productsCopy.filter((item) =>
         item.name.toLowerCase().includes(search.toLowerCase().trim())

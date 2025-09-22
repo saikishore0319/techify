@@ -100,20 +100,23 @@ const ShopContextProvider = (props) => {
     }
 
     const getProductsData = async () => {
-        try {
-            const response = await axios.get(backendUrl + "/api/product/list")
-            if (response.data.success) {
-                setProducts(response.data.products)
-            } else {
-                toast.error(response.data.message)
-            }
-
-        } catch (error) {
-            toast.error(error.message)
-            console.log(error.message);
-
+    try {
+        const response = await axios.get(backendUrl + "/api/product/list")
+        if (response.data.success) {
+            // Filter out products with stock < 1
+            const availableProducts = response.data.products.filter(
+                (product) => product.stock && product.stock > 0
+            );
+            setProducts(availableProducts)
+        } else {
+            toast.error(response.data.message)
         }
+
+    } catch (error) {
+        toast.error(error.message)
+        console.log(error.message);
     }
+}
 
     const getUserCart = async (token) => {
         try {
