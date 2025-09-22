@@ -109,7 +109,7 @@ const Login = () => {
 
             {/* Links */}
             <div className="flex justify-between items-center text-sm text-gray-600">
-              <p className="cursor-pointer hover:text-gray-900">Forgot your password?</p>
+              <p onClick={() => navigate("/forgot-password")} className="cursor-pointer hover:text-gray-900">Forgot your password?</p>
               {currentState === 'Login' ? (
                 <p
                   onClick={() => setCurrentState('Sign Up')}
