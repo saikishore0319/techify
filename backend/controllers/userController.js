@@ -163,6 +163,84 @@ const verifyOtp = async (req, res) => {
         console.log(error);
         return res.status(500).json({ success: false, message: error.message });
     }
+
 }
+
+// ========================= FORGOT PASSWORD =========================
+
+// 1. User requests password reset → send OTP
+export const forgotPassword = async (req, res) => {
+  try {
+    const emailRaw = req.body.email || "";
+    const email = emailRaw.trim().toLowerCase();
+
+    // Find user by email
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Generate new OTP for password reset
+    const otp = generateOtp();
+    user.otp = otp;
+    user.otpExpires = new Date(Date.now() + 5 * 60 * 1000); // valid 5 mins
+    await user.save();
+
+    // Send email to user
+    await sendEmail(email, "Reset your password", `Your OTP is: ${otp}`);
+
+    res.status(200).json({
+      success: true,
+      message: "OTP sent to your email to reset password",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// 2. User submits OTP + new password → reset password
+export const resetPassword = async (req, res) => {
+  try {
+    const emailRaw = req.body.email || "";
+    const email = emailRaw.trim().toLowerCase();
+    const { otp, newPassword } = req.body;
+
+    // Find user
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Validate OTP
+    const expired = user.otpExpires < new Date();
+    const mismatch = user.otp !== otp;
+
+    if (expired || mismatch) {
+      return res.status(400).json({
+        success: false,
+        message: expired ? "OTP expired" : "Invalid OTP",
+      });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update user password and clear OTP
+    user.password = hashedPassword;
+    user.otp = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successful",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 export { loginUser, registerUser, adminLogin, verifyOtp }
