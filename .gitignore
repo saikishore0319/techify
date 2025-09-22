@@ -1,4 +1,11 @@
 node_modules/
-.env*
-kubeseal
+.env
+# SonarQube
+.scannerwork/
+# OWASP Dependency-Check
+dependency-check-report/
 
+kubeseal*
+
+secret.yaml
+.env.k8s
