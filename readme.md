@@ -28,7 +28,12 @@ Techify is a simple ecommerce  web application based on MERN stack.
 - CD pipeline to update the image tags
 
 ![image](https://github.com/user-attachments/assets/46e889db-c147-4bc7-ad7b-a12a01cebf84)
--
+
+- ArgoCD application for deployment on Kubernetes
+
+![image](https://github.com/user-attachments/assets/02d783ad-4cd8-4e11-a06a-90b376a7883d)
+
+---
 
 > Below table helps you to navigate to the particular tool installation section fast.
 
@@ -38,11 +43,40 @@ Techify is a simple ecommerce  web application based on MERN stack.
 |[ArgoCd](#ArgoCd)|
 |[OWASP](#OWASP)|
 |[SonarQube](#SonarQube)|
+|[Trivy ](#Trivy )|
 |[Kubeseal](#Kubeseal)|
 
 
 ----
 ## Jenkins
+- Install and configure Jenkins
+```bash
+sudo apt update -y
+sudo apt install fontconfig openjdk-17-jre -y
+
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+  
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+  
+sudo apt-get update -y
+sudo apt-get install jenkins -y
+```
+- Now, access Jenkins Master on the browser on port 8080 and configure it.
+
+- Go to Jenkins Master and click on Manage **Jenkins --> Plugins --> Available**
+
+- plugins install the below plugins:
+ 
+  - OWASP
+
+  - SonarQube Scanner
+
+  -  Docker
+
+  -  Pipeline: Stage View
 
 ## ArgoCd
 ### Step 1 : Create Namespace for Argo CD
@@ -89,10 +123,79 @@ Password: (the decoded value above)
 
 Login via the browser.
 
+Use it to log in to the UI once.
+Then immediately change the password in the UI:
+
+>User icon (top right) → “Change Password” → set your new admin password.
+
+### Step 5 : Log in from CLI (with your new password)
+``` bash
+argocd login localhost:9000 --username admin --password <your-new-password> --insecure
+```
+This links your local `argocd` CLI to the UI/API running on port 9000.
+
+### Step 6 : Add Your Cluster (In-Cluster Setup for Kind)
+```bash
+argocd cluster add kind-kind-techify-cluster --in-cluster
+```
+**Confirm :**
+```bash
+argocd cluster list
+```
+**Output should show :**
+```bash
+https://kubernetes.default.svc  kind-kind-techify-cluster  1.31  Successful
+```
+### Step 7 : Create the Application
+In the UI:
+
+**Applications → NEW APP**
+
+Fill:
+
+- App name: techify
+
+- Project: default
+
+- Sync Policy: Manual (you can switch to Auto later)
+
+- Repository URL: your GitHub repo
+
+- Path: k8s
+
+- Cluster: https://kubernetes.default.svc
+
+- Namespace: techify
+
+Click **Create** → then Sync once to deploy.
+
+In the App view:
+
+**App Details → Sync Policy → Enable Auto-Sync**
+
+Now Argo CD will automatically sync every time you ``git push``.
+
 ## OWASP
+- Configure OWASP, move to **Manage Jenkins --> Plugins --> Available plugins** 
+
+- After OWASP plugin is installed, Now move to **Manage jenkins --> Tools**
+
+![image](https://github.com/user-attachments/assets/ea388f11-f3db-467e-99aa-f7625cd88edc)
 
 ## SonarQube    
-
+- Install and configure SonarQube 
+```bash
+docker run -itd --name SonarQube-Server -p 9000:9000 sonarqube:lts-community
+```
+## Trivy 
+- Install Trivy
+```bash
+sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+sudo apt-get update -y
+sudo apt-get install trivy -y
+```
 ## Kubeseal 
 kubeseal works with a Sealed Secrets controller running inside your cluster.
 
