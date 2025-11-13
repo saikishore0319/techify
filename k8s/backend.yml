@@ -16,7 +16,7 @@ spec:
       automountServiceAccountToken: false 
       containers:
       - name: backend
-        image: saikishore1903/techify-backend:v1.0
+        image: saikishore1903/techify-backend:v1.1
         ports:
         - containerPort: 5000
         envFrom:
