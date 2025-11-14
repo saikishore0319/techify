@@ -7,6 +7,8 @@ Techify is a simple ecommerce  web application based on MERN stack.
 # Techify Mega Project End to End Implementation
 ![image](https://github.com/user-attachments/assets/0315fa2d-6615-4c1e-b5a1-2b226701a8a5)
 
+
+![image](https://github.com/user-attachments/assets/46b13b95-92b5-4855-bdb2-85c6e47b065a)
 ## Tech Stack used in the project
 
 - MERN(React, Express js, Node js, Mongo DB)
