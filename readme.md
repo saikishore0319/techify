@@ -40,6 +40,7 @@ Techify is a simple ecommerce  web application based on MERN stack.
 |Tech stack Setup|
 |:------ |
 | [Jenkins](#Jenkins) |
+| [Github](#Github) |
 |[ArgoCd](#ArgoCd)|
 |[OWASP](#OWASP)|
 |[SonarQube](#SonarQube)|
@@ -77,6 +78,16 @@ sudo apt-get install jenkins -y
   -  Docker
 
   -  Pipeline: Stage View
+## Github
+
+### Configure a webhook :
+![image](https://github.com/user-attachments/assets/33708582-3921-42bf-9776-a148fffa894f)
+
+### Generate a PAT :
+![image](https://github.com/user-attachments/assets/9099d973-a449-4769-a667-434f42816ef8)
+
+### Add the generated PAT in jenkins credentials :
+![image](https://github.com/user-attachments/assets/fa31f82b-2940-4a09-bb01-8f46f5bf09d7)
 
 ## ArgoCd
 ### Step 1 : Create Namespace for Argo CD
@@ -183,10 +194,41 @@ Now Argo CD will automatically sync every time you ``git push``.
 ![image](https://github.com/user-attachments/assets/ea388f11-f3db-467e-99aa-f7625cd88edc)
 
 ## SonarQube    
-- Install and configure SonarQube 
+- Install and run SonarQube 
 ```bash
 docker run -itd --name SonarQube-Server -p 9000:9000 sonarqube:lts-community
 ```
+### Step 1 : Generate a SonarQube token
+Top right → My Account → Security → Generate Token
+
+![image](https://github.com/user-attachments/assets/88e312e1-7e73-4660-9bad-fe0d45ca9547)
+
+### Step 2 : Add the token inside jenkins
+Manage Jenkins → Credentials → Add Credential
+
+Type: Secret Text
+
+ID: sonar-token
+
+Secret: < your token >
+
+![image](https://github.com/user-attachments/assets/fa31f82b-2940-4a09-bb01-8f46f5bf09d7)
+
+### Step 3 : Add SonarQube Server in Jenkins
+
+Manage Jenkins → Configure System
+Scroll to SonarQube Servers → Add:
+
+Name: sonar-server
+
+Server URL: < Your server url >
+
+![image](https://github.com/user-attachments/assets/afad97d0-95c7-4abe-888e-ee1ff8937737)
+
+### Step 4 : Configure webhook
+
+![image](https://github.com/user-attachments/assets/e451cd24-7069-40c6-ab7a-f7f26800de24)
+
 ## Trivy 
 - Install Trivy
 ```bash
